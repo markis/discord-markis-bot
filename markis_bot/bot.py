@@ -1,11 +1,12 @@
 import asyncio
 import discord
-import json
 import logging
 import os
+import random
 import typing
 
 from discord.ext import commands
+from discord.user import User
 from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord_slash.model import SlashCommandOptionType
@@ -40,12 +41,17 @@ def _get_discord_guild_ids() -> typing.Optional[typing.List[int]]:
     ],
     guild_ids=_get_discord_guild_ids(),
 )
-async def compliment(ctx: SlashContext, name = None, *args, **kwargs):
-    log.info("Handing compliment")
-    log.info(json.dumps(name), extra={"args": args, "kwargs": kwargs})
-
-    name = getattr(ctx.author, "name", "")
-    await ctx.send(content=f"you look nice today, {name}")
+async def compliment(ctx: SlashContext, name: typing.Optional[User] = None) -> None:
+    try:
+        username = name.mention if name else ctx.author.mention
+        messages = [
+            f"You look nice today, {username}",
+            f"{username}, you're awesome!",
+        ]
+        await ctx.send(random.choice(messages))
+    except BaseException as err:
+        await ctx.send(f'/compliment "{name}" failed \n ```{err}```')
+        log.error(f'/compliment "{name}" failed', exc_info=True)
 
 
 def run_bot(token: str):
