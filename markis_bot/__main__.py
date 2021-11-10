@@ -3,6 +3,7 @@ import os
 import logging
 import signal
 import sys
+from typing import List
 
 from discord_slash.utils.manage_commands import remove_all_commands
 from markis_bot.bot import run_bot

@@ -2,8 +2,8 @@ import asyncio
 import discord
 import json
 import logging
-
-from typing import Optional
+import os
+import typing
 
 from discord.ext import commands
 from discord_slash import SlashCommand
@@ -19,6 +19,14 @@ bot = commands.Bot(command_prefix="/", intents=discord.Intents.default())
 commands = SlashCommand(bot, sync_commands=True)
 
 
+def _get_discord_guild_ids() -> typing.Optional[typing.List[int]]:
+    raw_env = os.environ.get("DISCORD_GUILD_ID")
+    if not raw_env:
+        return None
+
+    return [int(val) for val in raw_env.split(",") if val]
+
+
 @commands.slash(
     name="compliment",
     description="Feeling down? This might be just the pick-me-up you need!",
@@ -30,6 +38,7 @@ commands = SlashCommand(bot, sync_commands=True)
             required=False,
         )
     ],
+    guild_ids=_get_discord_guild_ids(),
 )
 async def compliment(ctx: SlashContext, name = None, *args, **kwargs):
     log.info("Handing compliment")
